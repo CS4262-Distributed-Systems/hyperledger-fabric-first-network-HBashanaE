@@ -236,4 +236,27 @@ public final class AssetTransfer implements ContractInterface {
 
         return response;
     }
+
+    /**
+     * Duplicate an asset on the ledger.
+     *
+     * @param ctx the transaction context
+     * @param assetID the ID of the original asset being duplicated
+     * @param owner the owner of the duplicated asset
+     * @return the duplicated asset
+     */
+    @Transaction(intent = Transaction.TYPE.SUBMIT)
+    public Asset DuplicateAsset(final Context ctx, final String assetID, final String owner) {
+
+        if (!AssetExists(ctx, assetID)) {
+            String errorMessage = String.format("Asset %s does not exist", assetID);
+            System.out.println(errorMessage);
+            throw new ChaincodeException(errorMessage, AssetTransferErrors.ASSET_NOT_FOUND.toString());
+        }
+
+        Asset originalAsset = ReadAsset(ctx, assetID);
+        Asset duplicatedAsset = CreateAsset(ctx, assetID + " - duplicate", originalAsset.getColor(), originalAsset.getSize(),
+        owner, originalAsset.getAppraisedValue());
+        return duplicatedAsset;
+    }
 }
